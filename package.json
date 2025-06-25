@@ -1,5 +1,5 @@
 {
-  "name": "AudioTestApp",
+  "name": "BrainBites",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -11,14 +11,17 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.24.0",
+    "@react-native-firebase/analytics": "^22.2.1",
+    "@react-native-firebase/app": "^22.2.1",
     "@react-native/new-app-screen": "0.80.0",
     "@react-navigation/native": "^7.1.14",
-    "@react-navigation/stack": "^7.4.0",
+    "@react-navigation/stack": "^7.4.2",
     "papaparse": "^5.5.3",
     "react": "19.1.0",
     "react-native": "0.80.0",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.26.0",
+    "react-native-push-notification": "^8.1.1",
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.5.0",
     "react-native-screens": "^4.11.1",

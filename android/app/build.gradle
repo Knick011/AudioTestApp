@@ -111,6 +111,11 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
+    // Fix duplicate class error by excluding support library from androidx.core
+    implementation("androidx.core:core:1.16.0") {
+        exclude group: "com.android.support"
+    }
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
