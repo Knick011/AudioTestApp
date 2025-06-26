@@ -1,5 +1,5 @@
 // src/screens/QuizScreen.js - Fixed version with original mascot functionality
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -29,11 +29,10 @@ const QuizScreen = ({ navigation, route }) => {
   const [streak, setStreak] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [category, setCategory] = useState(route.params?.category || 'funfacts');
+  const category = route.params?.category || 'funfacts';
   const [showPointsAnimation, setShowPointsAnimation] = useState(false);
   const [pointsEarned, setPointsEarned] = useState(0);
   const [score, setScore] = useState(0);
-  const [streakLevel, setStreakLevel] = useState(0);
   const [isStreakMilestone, setIsStreakMilestone] = useState(false);
   
   // Mascot state - simplified for quiz functionality
@@ -66,7 +65,6 @@ const QuizScreen = ({ navigation, route }) => {
       const scoreInfo = EnhancedScoreService.getScoreInfo();
       setStreak(scoreInfo.currentStreak);
       setScore(scoreInfo.dailyScore ?? 0);
-      setStreakLevel(scoreInfo.streakLevel);
     });
     
     // Load first question
@@ -85,10 +83,10 @@ const QuizScreen = ({ navigation, route }) => {
         timerAnimation.current.stop();
       }
     };
-  }, []);
+  }, [loadQuestion]);
 
   // Start a new question
-  const loadQuestion = async () => {
+  const loadQuestion = useCallback(async () => {
     setIsLoading(true);
     setSelectedAnswer(null);
     setIsCorrect(null);
@@ -176,9 +174,9 @@ const QuizScreen = ({ navigation, route }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [category, selectedAnswer, cardAnim, fadeAnim, explanationAnim, timerAnim, optionsAnim, handleTimeUp]);
   
-  const handleTimeUp = () => {
+  const handleTimeUp = useCallback(() => {
     // Check if already answered
     if (selectedAnswer !== null) return;
     
@@ -203,7 +201,7 @@ const QuizScreen = ({ navigation, route }) => {
     
     // Show mascot for timeout
     showMascotForTimeout();
-  };
+  }, [selectedAnswer, category, questionStartTime]);
   
   const showMascotForTimeout = () => {
     setMascotType('sad');
@@ -238,7 +236,6 @@ const QuizScreen = ({ navigation, route }) => {
       setShowPointsAnimation(true);
       setStreak(scoreResult.newStreak);
       setScore(scoreResult.newScore);
-      setStreakLevel(scoreResult.streakLevel);
       setCorrectAnswers(prev => prev + 1);
       
       // Animate points
@@ -289,7 +286,6 @@ const QuizScreen = ({ navigation, route }) => {
     const updatedScoreInfo = EnhancedScoreService.getScoreInfo();
     setScore(updatedScoreInfo.dailyScore ?? 0);
     setStreak(updatedScoreInfo.currentStreak);
-    setStreakLevel(updatedScoreInfo.streakLevel);
   };
   
   const showExplanationWithAnimation = () => {
@@ -305,7 +301,7 @@ const QuizScreen = ({ navigation, route }) => {
     console.log('🔥 Showing streak celebration for:', streakCount);
     
     let message = '';
-    let mascotType = 'excited';
+    let mascotTypeForStreak = 'excited';
     
     if (streakCount >= 15) {
       message = `🔥 LEGENDARY STREAK! ${streakCount} in a row! 🔥\n\nYou're absolutely UNSTOPPABLE! 🚀\nYou earned 2 bonus minutes!\n\nYou're a true Brain Bites master! 👑`;
@@ -315,7 +311,7 @@ const QuizScreen = ({ navigation, route }) => {
       message = `🎉 STREAK MILESTONE! ${streakCount} correct! 🎉\n\nFantastic job! You're doing great! ⭐\nYou earned 2 bonus minutes of app time!\n\nCan you reach ${Math.ceil(streakCount/5)*5 + 5}? 🎯`;
     }
     
-    setMascotType(mascotType);
+    setMascotType(mascotTypeForStreak);
     setMascotMessage(message);
     setShowMascot(true);
   };

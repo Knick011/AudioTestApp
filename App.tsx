@@ -1,10 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
+// App.tsx - Updated with Analytics
 import React, { useEffect, useState } from 'react';
 import { StatusBar, View, Text, ActivityIndicator, StyleSheet, LogBox, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -17,6 +11,8 @@ import WelcomeScreen from './src/screens/WelcomeScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import LeaderboardScreen from './src/screens/LeaderboardScreen';
+import AnalyticsTestScreen from './src/screens/AnalyticsTestScreen';
 
 // Import services
 import EnhancedTimerService from './src/services/EnhancedTimerService';
@@ -24,6 +20,7 @@ import SoundService from './src/services/SoundService';
 import QuizService from './src/services/QuizService';
 import ScoreService from './src/services/ScoreService';
 import NotificationService from './src/services/NotificationService';
+import AnalyticsService from './src/services/AnalyticsService';
 
 // Ignore specific warnings
 LogBox.ignoreLogs([
@@ -42,20 +39,32 @@ const App = () => {
       try {
         console.log("Initializing BrainBites services...");
         
+        // Initialize Analytics first
+        await AnalyticsService.initialize();
+        console.log("✓ Analytics service initialized");
+        
         // Check if first launch
         const hasLaunchedBefore = await AsyncStorage.getItem('brainbites_onboarding_complete');
-        setIsFirstLaunch(hasLaunchedBefore !== 'true');
+        const isFirstTime = hasLaunchedBefore !== 'true';
+        setIsFirstLaunch(isFirstTime);
         
-        // Initialize services in order
+        // Track app launch
+        await AnalyticsService.trackAppLaunch(isFirstTime);
+        
+        // Initialize other services
         await QuizService.initialize();
         console.log("✓ Quiz service initialized");
         
         await ScoreService.loadSavedData();
         console.log("✓ Score service initialized");
         
-        // Initialize timer service (handles native timer if available)
+        // Initialize timer service
         await EnhancedTimerService.loadSavedTime();
         console.log("✓ Timer service initialized");
+
+        // Initialize NotificationService safely
+        NotificationService.init();
+        console.log("✓ Notification service initialized");
         
         // Schedule notifications
         try {
@@ -75,13 +84,14 @@ const App = () => {
         
       } catch (error) {
         console.error("❌ Error initializing services:", error);
+        // Track initialization error
+        await AnalyticsService.trackError('initialization_error', error.message, 'App');
         setIsInitializing(false);
       }
     };
 
     initializeServices();
-
-    // Cleanup
+    
     return () => {
       EnhancedTimerService.cleanup();
       try {
@@ -91,7 +101,7 @@ const App = () => {
       }
     };
   }, []);
-  
+
   if (isInitializing) {
     return (
       <View style={styles.loadingContainer}>
@@ -104,7 +114,26 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" backgroundColor="#FFF8E7" />
-      <NavigationContainer>
+      <NavigationContainer
+        onStateChange={(state) => {
+          // Track screen changes
+          const getCurrentRouteName = (navigationState) => {
+            if (!navigationState || typeof navigationState.index !== 'number') {
+              return null;
+            }
+            const route = navigationState.routes[navigationState.index];
+            if (route.state) {
+              return getCurrentRouteName(route.state);
+            }
+            return route.name;
+          };
+          
+          const currentRouteName = getCurrentRouteName(state);
+          if (currentRouteName) {
+            AnalyticsService.trackScreen(currentRouteName);
+          }
+        }}
+      >
         <Stack.Navigator 
           initialRouteName={isFirstLaunch ? "Welcome" : "Home"}
           screenOptions={{
@@ -116,6 +145,12 @@ const App = () => {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Quiz" component={QuizScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+          {__DEV__ && (
+            <>
+              <Stack.Screen name="AnalyticsTest" component={AnalyticsTestScreen} />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

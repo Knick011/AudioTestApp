@@ -16,14 +16,14 @@ const commonStyles = StyleSheet.create({
   
   // Cards and sections
   card: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.md,
     padding: theme.spacing.md,
     ...theme.shadows.md,
     marginBottom: theme.spacing.md,
   },
   section: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.md,
     padding: theme.spacing.md,
     ...theme.shadows.md,
@@ -84,7 +84,7 @@ const commonStyles = StyleSheet.create({
     ...theme.shadows.btn,
   },
   secondaryButton: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.white,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.lg,
     borderRadius: theme.borderRadius.full,
@@ -106,7 +106,7 @@ const commonStyles = StyleSheet.create({
   
   // Question styles
   questionCard: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: theme.colors.white,
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
     ...theme.shadows.lg,

@@ -297,7 +297,7 @@ const EnhancedMascotDisplay = ({
   
   // Get appropriate mascot image
   const getMascotImage = () => {
-    return MASCOT_IMAGES[type];
+    return MASCOT_IMAGES[type] || MASCOT_IMAGES.happy;
   };
   
   // Don't render if not visible
@@ -310,7 +310,11 @@ const EnhancedMascotDisplay = ({
           onPress={handlePeekingMascotPress}
           activeOpacity={0.8}
         >
-          <Image source={getMascotImage()} style={styles.peekingImage} />
+          <Image 
+            source={MASCOT_IMAGES.below || MASCOT_IMAGES.happy} 
+            style={styles.peekingImage} 
+            resizeMode="contain" 
+          />
         </TouchableOpacity>
       </View>
     );
@@ -381,7 +385,11 @@ const EnhancedMascotDisplay = ({
               style={styles.mascotImageContainer}
               disabled={!(isQuizScreen && type === 'sad' && selectedAnswer && !isCorrect)}
             >
-              <Image source={getMascotImage()} style={styles.mascotImage} />
+              <Image 
+                source={getMascotImage()} 
+                style={styles.mascotImage} 
+                resizeMode="contain" 
+              />
             </TouchableOpacity>
           </Animated.View>
         </View>

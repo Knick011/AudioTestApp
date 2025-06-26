@@ -10,8 +10,7 @@ import {
   Animated,
   Easing,
   Dimensions,
-  Platform,
-  AppState
+  Platform
 } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -31,7 +30,6 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
   
-  const [user, setUser] = useState({ name: 'Cabby' });
   const [isInitializing, setIsInitializing] = useState(true);
   const [availableTime, setAvailableTime] = useState(0);
   const [dailyStreak, setDailyStreak] = useState(0);
@@ -47,7 +45,6 @@ const HomeScreen = () => {
     totalDaysPlayed: 0,
     allTimeHighScore: 0
   });
-  const [showIntro, setShowIntro] = useState(false);
   const [rewardSettings, setRewardSettings] = useState({
     normalReward: 30,
     milestoneReward: 120
@@ -125,35 +122,39 @@ const HomeScreen = () => {
   // Load daily streak data from AsyncStorage
   const loadDailyStreakData = async () => {
     try {
-      const streakDataString = await AsyncStorage.getItem('brainbites_daily_streak');
-      if (streakDataString) {
-        const streakData = JSON.parse(streakDataString);
+      const streakData = await AsyncStorage.getItem('brainbites_daily_streak');
+      if (streakData) {
+        const parsed = JSON.parse(streakData);
+        setDailyStreak(parsed.streak || 0);
+        
+        // Check if user played today
         const today = new Date().toDateString();
-        const lastPlayedDate = new Date(streakData.lastPlayedDate).toDateString();
-        
-        // Check if user has played today
-        const playedToday = today === lastPlayedDate;
-        setHasPlayedToday(playedToday);
-        
-        // Set the streak count
-        setDailyStreak(streakData.streak || 0);
-        
-        console.log('Loaded streak data:', { 
-          streak: streakData.streak, 
-          lastPlayedDate: streakData.lastPlayedDate,
-          playedToday,
-          today
-        });
-      } else {
-        // First time user, initialize streak data
-        setDailyStreak(0);
-        setHasPlayedToday(false);
-        console.log('No streak data found, initializing new user');
+        const hasPlayed = parsed.lastPlayedDate === today;
+        setHasPlayedToday(hasPlayed);
       }
     } catch (error) {
       console.error('Error loading streak data:', error);
-      setDailyStreak(0);
-      setHasPlayedToday(false);
+    }
+  };
+
+  // Load all necessary data for the component
+  const loadData = async () => {
+    try {
+      await loadDailyStreakData();
+      await loadCategories();
+      await loadSettings();
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
+
+  // Check if user completed a quiz today
+  const checkQuizCompletion = async () => {
+    const scoreInfo = EnhancedScoreService.getScoreInfo();
+    // If user has a daily score > 0 and hasn't played today, they just completed a quiz
+    if (scoreInfo.dailyScore > 0 && !hasPlayedToday) {
+      console.log('User returned from quiz with score, updating streak');
+      await updateDailyStreak();
     }
   };
 
@@ -162,7 +163,8 @@ const HomeScreen = () => {
     const checkFirstLaunch = async () => {
       const hasLaunched = await AsyncStorage.getItem('brainbites_onboarding_complete');
       if (!hasLaunched) {
-        setShowIntro(true);
+        // Handle first launch - could navigate to onboarding or show intro
+        console.log('First launch detected');
       }
     };
     checkFirstLaunch();
@@ -182,17 +184,11 @@ const HomeScreen = () => {
   };
   
   useEffect(() => {
-    // Play menu music when entering home screen
-    SoundService.startMenuMusic();
+    // Load initial data
+    loadData();
     
-    // Load categories
-    loadCategories();
-    
-    // Load settings
-    loadSettings();
-    
-    // Initialize animation values for categories
-    initializeCategoryAnimations(categories);
+    // Check if user completed a quiz today
+    checkQuizCompletion();
     
     // Start entrance animations
     startEntranceAnimations();
@@ -232,9 +228,9 @@ const HomeScreen = () => {
       clearTimeout(welcomeTimer);
       scoreListener();
     };
-  }, []);
+  }, [categories, handleDailyReset, initializeCategoryAnimations, mascotEnabled, showInitialMascotMessage, startEntranceAnimations]);
   
-  const updateDailyStreak = async () => {
+  const updateDailyStreak = useCallback(async () => {
     const today = new Date().toDateString();
     
     // Only update streak if user hasn't played today
@@ -259,7 +255,7 @@ const HomeScreen = () => {
     } else {
       console.log('User already played today, streak not updated');
     }
-  };
+  }, [dailyStreak, hasPlayedToday, mascotEnabled]);
   
   const showStreakCelebration = (streak) => {
     let message = '';
@@ -330,7 +326,7 @@ const HomeScreen = () => {
   };
   
   // Initialize animation values for categories
-  const initializeCategoryAnimations = (categoriesList) => {
+  const initializeCategoryAnimations = useCallback((categoriesList) => {
     // Clear existing animation values
     categoryAnimValues.length = 0;
     
@@ -354,13 +350,13 @@ const HomeScreen = () => {
     
     // Start all animations in parallel
     Animated.parallel(animations).start();
-  };
+  }, [categoryAnimValues]);
   
   // Update category animations when categories change
   useEffect(() => {
     // Initialize animation values for new categories
     initializeCategoryAnimations(categories);
-  }, [categories]);
+  }, [categories, initializeCategoryAnimations]);
   
   const loadCategories = async () => {
     try {
@@ -395,19 +391,16 @@ const HomeScreen = () => {
     }
   };
   
-  const handleStartQuiz = async (category) => {
+  const handleStartQuiz = useCallback(async (category) => {
     // Play button press sound
     SoundService.playButtonPress();
     
-    // Hide mascot
-    setShowMascot(false);
+    // Update daily streak if this is the first quiz of the day
+    await updateDailyStreak();
     
-    // Stop menu music
-    SoundService.stopMusic();
-    
-    // Navigate to quiz
+    // Navigate to quiz screen
     navigation.navigate('Quiz', { category });
-  };
+  }, [navigation, updateDailyStreak]);
   
   const handleOpenSettings = () => {
     // Play button press sound

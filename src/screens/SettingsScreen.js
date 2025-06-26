@@ -425,15 +425,6 @@ const SettingsScreen = ({ navigation }) => {
 
             <TouchableOpacity 
               style={styles.settingItem}
-              onPress={() => navigation.navigate('AudioTimerTest')}
-            >
-              <Icon name="timer" size={22} color="#FF9F1C" />
-              <Text style={styles.settingText}>Test Audio Timer</Text>
-              <Icon name="chevron-right" size={22} color="#666" />
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.settingItem}
               onPress={() => navigation.navigate('AnalyticsTest')}
             >
               <Icon name="google-analytics" size={22} color="#FF9F1C" />

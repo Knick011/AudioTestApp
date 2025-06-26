@@ -1,7 +1,7 @@
 // src/services/AppLauncher.js
 import { Linking, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import EnhancedTimerService from './EnhancedTimerService';
+import TimerService from './TimerService';
 
 // App schemes for deep linking
 const APP_SCHEMES = {
@@ -82,6 +82,13 @@ const APP_INFO = {
   },
 };
 
+// Helper function to format time
+const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+};
+
 // Example of enhanced app launcher card UI
 const AppLauncherCard = ({ app, timeAvailable, onLaunch }) => {
   return (
@@ -160,14 +167,14 @@ class AppLauncher {
       }
       
       // Check if we have enough time
-      const availableTime = EnhancedTimerService.getAvailableTime();
+      const availableTime = TimerService.getAvailableTime();
       if (availableTime <= 0) {
         console.error('No time available');
         return false;
       }
       
       // Start timer
-      EnhancedTimerService.startAppTimer(appId);
+      TimerService.startAppTimer(appId);
       
       // Set as active app
       this.activeApp = appId;
