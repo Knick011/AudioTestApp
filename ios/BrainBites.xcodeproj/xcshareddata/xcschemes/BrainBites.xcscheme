@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "AudioTestApp.app"
-               BlueprintName = "AudioTestApp"
-               ReferencedContainer = "container:AudioTestApp.xcodeproj">
+               BuildableName = "BrainBites.app"
+               BlueprintName = "BrainBites"
+               ReferencedContainer = "container:BrainBites.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "AudioTestAppTests.xctest"
-               BlueprintName = "AudioTestAppTests"
-               ReferencedContainer = "container:AudioTestApp.xcodeproj">
+               BuildableName = "BrainBitesTests.xctest"
+               BlueprintName = "BrainBitesTests"
+               ReferencedContainer = "container:BrainBites.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "AudioTestApp.app"
-            BlueprintName = "AudioTestApp"
-            ReferencedContainer = "container:AudioTestApp.xcodeproj">
+            BuildableName = "BrainBites.app"
+            BlueprintName = "BrainBites"
+            ReferencedContainer = "container:BrainBites.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "AudioTestApp.app"
-            BlueprintName = "AudioTestApp"
-            ReferencedContainer = "container:AudioTestApp.xcodeproj">
+            BuildableName = "BrainBites.app"
+            BlueprintName = "BrainBites"
+            ReferencedContainer = "container:BrainBites.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

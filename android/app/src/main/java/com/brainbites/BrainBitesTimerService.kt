@@ -1,4 +1,4 @@
-package com.audiotestapp
+package com.brainbites
 
 import android.app.*
 import android.content.Context
@@ -294,7 +294,7 @@ class BrainBitesTimerService : Service() {
     
     private fun createNotification(): Notification {
         // Create intent to open BrainBites app
-        val intent = Intent(this, com.audiotestapp.MainActivity::class.java)
+        val intent = Intent(this, com.brainbites.MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent, 
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

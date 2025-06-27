@@ -1,4 +1,4 @@
-package com.audiotestapp
+package com.brainbites
 
 import android.content.BroadcastReceiver
 import android.content.Context

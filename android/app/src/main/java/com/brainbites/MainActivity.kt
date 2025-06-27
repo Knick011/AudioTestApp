@@ -1,4 +1,4 @@
-package com.audiotestapp
+package com.brainbites
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
