@@ -13,7 +13,7 @@ import {
   Platform
 } from 'react-native';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import EnhancedTimerService from '../services/EnhancedTimerService';
 import QuizService from '../services/QuizService';
 import SoundService from '../services/SoundService';
@@ -137,26 +137,10 @@ const HomeScreen = () => {
     }
   };
 
-  // Load all necessary data for the component
-  const loadData = async () => {
-    try {
-      await loadDailyStreakData();
-      await loadCategories();
-      await loadSettings();
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-  };
-
-  // Check if user completed a quiz today
-  const checkQuizCompletion = async () => {
-    const scoreInfo = EnhancedScoreService.getScoreInfo();
-    // If user has a daily score > 0 and hasn't played today, they just completed a quiz
-    if (scoreInfo.dailyScore > 0 && !hasPlayedToday) {
-      console.log('User returned from quiz with score, updating streak');
-      await updateDailyStreak();
-    }
-  };
+  // Load categories once when component mounts
+  useEffect(() => {
+    loadCategories();
+  }, []); // Empty dependency array - only run once
 
   // This effect handles the initial onboarding check
   useEffect(() => {
@@ -350,7 +334,7 @@ const HomeScreen = () => {
     
     // Start all animations in parallel
     Animated.parallel(animations).start();
-  }, [categoryAnimValues]);
+  }, []);
   
   // Update category animations when categories change
   useEffect(() => {
@@ -477,18 +461,18 @@ const HomeScreen = () => {
   };
   
   const getCategoryIcon = (category) => {
-    // Map categories to icons - using more common icons that are definitely available
+    // Map categories to icons - using basic Ionicons
     const iconMap = {
-      'funfacts': 'lightbulb-outline',
-      'psychology': 'head-question-outline',
-      'math': 'calculator',
+      'funfacts': 'star',
+      'psychology': 'heart',
+      'math': 'add',
       'science': 'flask',
-      'history': 'book-open-variant',
-      'english': 'alphabetical',
-      'general': 'help-circle-outline'
+      'history': 'book',
+      'english': 'text',
+      'general': 'help-circle'
     };
     
-    return iconMap[category] || 'help-circle-outline';
+    return iconMap[category] || 'star';
   };
   
   const getCategoryColor = (category) => {
@@ -549,7 +533,7 @@ const HomeScreen = () => {
               style={styles.settingsButton}
               onPress={handleOpenSettings}
             >
-              <Icon name="cog" size={24} color="#333" />
+              <Icon name="settings" size={24} color="#333" />
             </TouchableOpacity>
           </View>
           
@@ -681,7 +665,9 @@ const HomeScreen = () => {
                       { backgroundColor: getCategoryColor(category) }
                     ]}
                   >
-                    <Icon name={getCategoryIcon(category)} size={24} color="white" />
+                    <Text style={{color: 'white', fontSize: 16, fontWeight: 'bold'}}>
+                      {category.charAt(0).toUpperCase()}
+                    </Text>
                   </View>
                   <Text style={styles.categoryName}>
                     {category.charAt(0).toUpperCase() + category.slice(1)}
